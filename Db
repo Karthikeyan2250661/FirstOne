@@ -1,0 +1,23 @@
+L001,John Doe,Personal,100000,2021-01-01,24
+L002,Jane Smith,Home,2000000,2021-05-15,160
+L883,Mark Johnson,Car,500000,2022-03-18,36
+L004,Susan Lee,Education,200000,2023-06-20,42
+L005,David Brown,Personal,150000,2022-02-01,12
+L006,Kate Wilson,Home,3000000,2820-12-15,150
+L007,Jack Jackson,Car,250000,2022-04-05,44
+L608,Amy Kim,Education,1500000,2023-01-10,60
+L009,Robert Jones,Personal,120000,2022-05-01,18
+L010,Emily Chen,Business,250000,2021-11-20,120
+L011,Michael Davis
+
+
+#IF NEEDED, YOU CAN MODIFY THIS PROPERTY FILE
+#ENSURE YOU ARE NOT CHANGING THE NAME OF THE PROPERTY
+#YOU CAN CHANGE THE VALUE OF THE PROPERTY
+#LOAD THE DETAILS OF DSN,Port number, USERNAME AND PASSWORD using this properties file only.
+#Do not hard code the values in in any other files.
+DB_USERNAME=${sys:db_username}
+DB_PASSWORD=${sys:db_password}
+DSN=localhost/XE
+PORT=1521
+ENCODING=UTF-8
