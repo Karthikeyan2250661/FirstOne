@@ -3,88 +3,89 @@ import touristservice as ts
 import utility as ut
 
 def parse_tourist_input(input_data):
-    valid_places = ["Beach", "Pilgrimage", "Heritage", "Hill Station", "Water Falls", "Adventures"]
-    place = None
-    place_start = -1
-    place_end = -1
-    for valid_place in valid_places:
-        if valid_place in input_data:
-            place_start = input_data.find(valid_place)
-            place_end = place_start + len(valid_place)
-            place = valid_place
-            break
-    if place is None:
+    # Try colon-separated first
+    parts = input_data.split(':')
+    if len(parts) == 5:
+        name, place, date_str, days_str, tickets_str = parts
+        # Normalize date to ddmmyyyy
+        bookingdate = date_str.replace('/', '')
+        try:
+            noofdays = int(days_str)
+            nooftickets = int(tickets_str)
+        except ValueError:
+            return None, None, None, None, None
+        return name, place, bookingdate, noofdays, nooftickets
+
+    # Fallback: concatenated format (touristname+place+ddmmyyyy+days+tickets)
+    valid_places = ["Beach","Pilgrimage","Heritage","Hill Station","Water Falls","Adventures"]
+    place = next((p for p in valid_places if p in input_data), None)
+    if not place:
         return None, None, None, None, None
-    touristname = input_data[:place_start]
-    remaining = input_data[place_end:]
-    digits = ''.join([c for c in remaining if c.isdigit()])
+    i = input_data.find(place)
+    name = input_data[:i]
+    tail = input_data[i+len(place):]
+    digits = ''.join(c for c in tail if c.isdigit())
     if len(digits) < 10:
         return None, None, None, None, None
     bookingdate = digits[:8]
-    days_tickets = digits[8:]
-    if len(days_tickets) == 2:
-        noofdays = int(days_tickets[0])
-        nooftickets = int(days_tickets[1])
-    elif len(days_tickets) == 3:
-        option1_days = int(days_tickets[0])
-        option1_tickets = int(days_tickets[1:])
-        option2_days = int(days_tickets[:2])
-        option2_tickets = int(days_tickets[2])
-        if option2_days <= 20 and option2_tickets >= 1:
-            noofdays = option2_days
-            nooftickets = option2_tickets
-        else:
-            noofdays = option1_days
-            nooftickets = option1_tickets
+    rest = digits[8:]
+    # split rest into days/tickets
+    if len(rest) == 2:
+        d, t = rest
+    elif len(rest) == 3:
+        # try X,YZ first
+        d, t = rest[0], rest[1:]
     else:
-        noofdays = int(days_tickets[:-1])
-        nooftickets = int(days_tickets[-1:])
-    return touristname, place, bookingdate, noofdays, nooftickets
+        d, t = rest[:-1], rest[-1]
+    return name, place, bookingdate, int(d), int(t)
 
 def main():
-    no_tourists = int(input("Enter the number of registrations: "))
     tr = ts.Tourism()
-    for i in range(0, no_tourists):
-        print("Enter the registration details", i+1)
-        input_data = input()
-        result = parse_tourist_input(input_data)
-        if result[0] is None:
+    n = int(input("Enter the number of registrations: "))
+    for idx in range(1, n+1):
+        print(f"Enter the registration details {idx}")
+        entry = input().strip()
+        name, place, bd, days, tickets = parse_tourist_input(entry)
+        if not name:
             print("Invalid input format")
             continue
-        touristname, place, bookingdate, noofdays, nooftickets = result
-        place_status = ut.validateplace(place)
-        if place_status != True:
-            print(place_status)
-            continue
-        date_status = ut.validatedate(bookingdate)
-        if date_status != True:
-            print(date_status)
-            continue
-        touristid = tr.generateid(touristname, bookingdate)
-        tr.addtouristdetails(touristid, touristname, place, bookingdate, noofdays, nooftickets)
-    place = input("Enter the Place to be searched: ")
-    place_status = ut.validateplace(place)
-    if place_status == True:
-        tourist_place = tr.retrievedetailsbyplace(place)
-        if type(tourist_place) != str and tourist_place != None:
-            for i in tourist_place:
-                print("Tourist ID:", i.gettouristid())
-                print("Tourist Name:", i.gettouristname())
-                print("Number Of Days:", i.getnoofdays())
-                print("Number Of Tickets:", i.getnooftickets())
-                print("Bill Amount:", i.getbillamount())
+        # Validate
+        vp = ut.validateplace(place)
+        if vp is not True:
+            print(vp); continue
+        vd = ut.validatedate(bd)
+        if vd is not True:
+            print(vd); continue
+        # Generate ID and add
+        tid = tr.generateid(name, bd)
+        tr.addtouristdetails(tid, name, place, bd, days, tickets)
+
+    # Retrieve by place
+    place = input("Enter the Place to be searched: ").strip()
+    vp = ut.validateplace(place)
+    if vp is True:
+        res = tr.retrievedetailsbyplace(place)
+        if isinstance(res, str):
+            print(res)
         else:
-            print(tourist_place)
+            for t in res:
+                print("Tourist ID:", t.gettouristid())
+                print("Tourist Name:", t.gettouristname())
+                print("Number Of Days:", t.getnoofdays())
+                print("Number Of Tickets:", t.getnooftickets())
+                print("Bill Amount:", t.getbillamount())
     else:
-        print(place_status)
-    month = int(input("Enter the month: "))
-    if month >= 1 and month <= 12:
-        tourists_by_month = tr.searchtouristbymonth(month)
-        if type(tourists_by_month) != str:
-            for tourist_dict in tourists_by_month:
-                print(f"touristid:{tourist_dict['touristid']} touristname:{tourist_dict['touristname']} place:{tourist_dict['place']} bookingdate:{tourist_dict['bookingdate']}")
+        print(vp)
+
+    # Retrieve by month
+    m = int(input("Enter the month: "))
+    if 1 <= m <= 12:
+        res = tr.searchtouristbymonth(m)
+        if isinstance(res, str):
+            print(res)
         else:
-            print(tourists_by_month)
+            for d in res:
+                print(f"touristid:{d['touristid']} touristname:{d['touristname']} place:{d['place']} bookingdate:{d['bookingdate']}")
     else:
         print("Invalid month")
 
