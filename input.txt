@@ -1,0 +1,1 @@
+echo -e "Book\nWar and Peace\n39.99\n10\nFICTION\nLeo Tolstoy\n9780399567991\nsell\n2" | python ambika.py

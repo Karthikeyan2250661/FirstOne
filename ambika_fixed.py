@@ -82,13 +82,13 @@ class ElectronicItem(InventoryItem):
 
 #Non editable starts here
 def main():
-    input = input()
+    input_data = sys.stdin.read().splitlines()
     
-    item_type = input[0]
-    name = input[1]
-    base_price = float(input[2])
-    quantity_in_stock = int(input[3])
-    category_str = input[4].upper()
+    item_type = input_data[0]
+    name = input_data[1]
+    base_price = float(input_data[2])
+    quantity_in_stock = int(input_data[3])
+    category_str = input_data[4].upper()
     
     try:
         category = Category[category_str]
@@ -99,19 +99,19 @@ def main():
     item = None
     
     if item_type.lower() == "book":
-        author = input[5]
-        isbn = input[6]
+        author = input_data[5]
+        isbn = input_data[6]
         item = Book(name, base_price, quantity_in_stock, category, author, isbn)
     elif item_type.lower() == "electronic":
-        warranty_months = int(input[5])
-        brand = input[6]
+        warranty_months = int(input_data[5])
+        brand = input_data[6]
         item = ElectronicItem(name, base_price, quantity_in_stock, category, warranty_months, brand)
     else:
         print("Invalid item type entered.")
         return
     
-    action = input[7]
-    quantity = int(input[8])
+    action = input_data[7]
+    quantity = int(input_data[8])
     
     if action.lower() == "sell":
         item.sell(quantity)
