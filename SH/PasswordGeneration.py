@@ -26,8 +26,6 @@ class Vehicle(ABC):
 
 ##Define the inherited class 'Car' here
 class Car(Vehicle):
-    def __init__(self, model, reg_no, vehicle_type):
-        super().__init__(model, reg_no, vehicle_type)
     
     def generate_key(self):
         reg_no = self.get_reg_no()
@@ -47,8 +45,6 @@ class Car(Vehicle):
 
 ##Define the inherited class 'Bike' here
 class Bike(Vehicle):
-    def __init__(self, model, reg_no, vehicle_type):
-        super().__init__(model, reg_no, vehicle_type)
     
     def generate_key(self):
         reg_no = self.get_reg_no()
