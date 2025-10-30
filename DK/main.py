@@ -1,5 +1,5 @@
 # main.py
-import touristservice as ts
+import tourist_service as ts
 import utility as ut
 
 def parse_tourist_input(input_data):
@@ -85,7 +85,7 @@ def main():
             print(res)
         else:
             for d in res:
-                print(f"touristid:{d['touristid']} touristname:{d['touristname']} place:{d['place']} bookingdate:{d['bookingdate']}")
+                print(f"tourist_id:{d['touristid']}\n tourist_name:{d['touristname']} place:{d['place']} bookingdate:{d['bookingdate']}")
     else:
         print("Invalid month")
 
